@@ -7,7 +7,7 @@ The `src` folder contains three Python 3 scripts:
 
 Folder `assets` contains the `CPDB_pathways_genes.tab` with the list of pathways and involved genes.
 
-Folder `matrices` contains a directory for each of the TCGA tumors with a matrix for each of the pathways generated with the `prepare_data.py` script.
+BZ2 compressed tarballs `pathways-tcga.tar.bz2` and `random-tcga.tar.bz2` contain a directory for each of the TCGA tumors with a matrix for each of the pathways generated with the `prepare_data.py` script.
 
 How to evaluate a pathway:
 ```
