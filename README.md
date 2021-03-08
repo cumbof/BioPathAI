@@ -9,6 +9,10 @@ Folder `assets` contains the `CPDB_pathways_genes.tab` with the list of pathways
 
 BZ2 compressed tarballs `pathways-tcga.tar.bz2` and `random-tcga.tar.bz2` contain a directory for each of the TCGA tumors with a matrix for each of the pathways generated with the `prepare_data.py` script.
 
+Due to their size, both the compressed tarballs are available outside GitHub:
+- [https://www.dropbox.com/s/e045x0a65aevrst/pathways-tcga.tar.bz2?dl=1](https://www.dropbox.com/s/e045x0a65aevrst/pathways-tcga.tar.bz2?dl=1)
+- [https://www.dropbox.com/s/hfuhdzojzqiondn/random-tcga.tar.bz2?dl=1](https://www.dropbox.com/s/hfuhdzojzqiondn/random-tcga.tar.bz2?dl=1)
+
 How to evaluate a pathway:
 ```
 python evaluate.py 
