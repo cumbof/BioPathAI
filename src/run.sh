@@ -8,14 +8,15 @@ NPATHWAYS=`ls "${INFOLDER}" | wc -l`
 NEVAL=`ls "${OUTFOLDER}/*__evaluation.csv" | wc -l`
 while [ $NEVAL -lt $NPATHWAYS ]; do
     find $INFOLDER \
-        -type f -name "*.csv" -follow | xargs -n 1 -P $XARGSNPROC sh -c \
-        'if [ ! -f "${OUTFOLDER}"/"$(basename "$0" .csv)__evaluation.csv" ] ; then \
-            python evaluate.py \
-                        --input "$0" \
+        -type f -name "*.csv" -follow | xargs -n 1 -P $XARGSNPROC -i sh -c \
+            'INPUT={};
+	         if [ ! -f '"${OUTFOLDER}"'/"$(basename "${INPUT}" .csv)__evaluation.csv" ] ; then \
+	         python evaluate.py \
+                        --input "${INPUT}" \
                         --folds 10 \
-                        --output_prefix "${OUTFOLDER}"/"$(basename "$0" .csv)" \
+                        --output_prefix '"${OUTFOLDER}"'/"$(basename "${INPUT}" .csv)" \
                         --verbose ; \
-         fi'
+             fi'
     # Search for missing evaluations and process them one by one
     NEVAL=`ls "${OUTFOLDER}/*__evaluation.csv" | wc -l`
     XARGSNPROC=1
