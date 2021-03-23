@@ -3,7 +3,7 @@
 __authors__ = ( 'Fabio Cumbo (fabio.cumbo@unitn.it)',
                 'Giovanni Felici (giovanni.felici@iasi.cnr.it)' )
 __version__ = '0.01'
-__date__ = 'Feb 15, 2021'
+__date__ = 'Mar 23, 2021'
 
 import sys, os
 import argparse as ap
@@ -59,7 +59,7 @@ NAMES = ["Logistic Regression", "Linear Discriminant Analysis", "Nearest Neighbo
          "Gaussian Process", "Decision Tree", "Random Forest", "Neural Net", "AdaBoost", "Naive Bayes", "QDA"]
 
 CLASSIFIERS = [
-    LogisticRegression(random_state=SEED),                                                     # Logistic Regression
+    LogisticRegression(random_state=SEED),                                                     # Logistic Regression
     LinearDiscriminantAnalysis(),                                                              # Linear Discriminant Analysis
     KNeighborsClassifier(3),                                                                   # Nearest Neighbors
     SVC(kernel="linear", C=0.025, random_state=SEED),                                          # Linear SVM
@@ -153,16 +153,19 @@ if __name__ == '__main__':
     dataframe = pd.read_csv(args.input, index_col=0)
     # Fix class column name
     dataframe.set_axis([*dataframe.columns[:-1], 'Class'], axis=1, inplace=True)
+    pathsize = len(list(dataframe.columns))-1 # Exclude the 'Class' column
+    if args.verbose:
+        print("\tPathway Size: {}".format(pathsize))
     evaluation_matrix, predictions, labels = process(dataframe, classifiers, args.folds)
 
     if args.verbose:
         print('Dumping evaluation and confusion matrices')
-        print('\t{}__evaluation.csv'.format(args.output_prefix))
-        print('\t{}__confusion.csv'.format(args.output_prefix))
+        print('\t{}__{}__evaluation.csv'.format(args.output_prefix, pathsize))
+        print('\t{}__{}__confusion.csv'.format(args.output_prefix, pathsize))
     # Retrieve processed samples
     samples = set(evaluation_matrix[list(evaluation_matrix.keys())[0]].keys())
     # Dump evaluation matrix
-    with open('{}__evaluation.csv'.format(args.output_prefix), "w+") as outfile:
+    with open('{}__{}__evaluation.csv'.format(args.output_prefix, pathsize), "w+") as outfile:
         # Write header line
         outfile.write("SampleID,{},Class\n".format(",".join(classifiers)))
         for sample in samples:
@@ -172,7 +175,9 @@ if __name__ == '__main__':
             rowData = dataframe.loc[sample, :]
             outfile.write(",{}\n".format(rowData.Class))
     # Dump confusion matrices
-    with open('{}__confusion.csv'.format(args.output_prefix), "w+") as outfile:
+    with open('{}__{}__confusion.csv'.format(args.output_prefix, pathsize), "w+") as outfile:
+        # Take note of the number of features in the original matrix (pathway size)
+        outfile.write("# Pathway size: {}".format(pathsize))
         # Write header line
         header = ""
         for class_label in labels:
