@@ -102,6 +102,8 @@ if __name__ == '__main__':
         os.mkdir( args.folder )
 
     # Load the list of pathways and their genes
+    if args.verbos:
+        print("Loading pathways")
     pathway2genes, gene2pathways = load_pathways(args.pathways, args.random)        
     if args.random:
         pathway_sizes = set()
