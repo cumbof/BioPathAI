@@ -17,10 +17,14 @@ def read_params():
     p.add_argument( '--pathways', 
                     type = str,
                     help = "Pathways definition file (CPDB_pathways_genes.tab)" )
-    p.add_argument( '--random',
+    p.add_argument( '--random_pathways',
                     action = 'store_true',
                     default = False,
                     help = "Generate random pathways" )
+    p.add_argument( '--random_classes',
+                    action = 'store_true',
+                    default = False,
+                    help = "Shuffle classes" )
     p.add_argument( '--how_many', 
                     type = int,
                     default = 100,
@@ -45,7 +49,8 @@ TUMORS = [ "tcga-acc","tcga-blca","tcga-brca","tcga-cesc","tcga-chol",
            "tcga-ucec","tcga-ucs","tcga-uvm" ]
 
 # OpenGDC data on polimi server
-GEQ_MASK = "/home/cappelli/opengdc/bed/tcga/{}/gene_expression_quantification/"
+#GEQ_MASK = "/home/cappelli/opengdc/bed/tcga/{}/gene_expression_quantification/"
+GEQ_MASK = "/shares/CIBIO-Storage/CM/scratch/users/fabio.cumbo/tmp/bed/{}/"
 
 def load_pathways( pathways_filepath, genrandom ):
     pathway2genes = {}
@@ -102,10 +107,10 @@ if __name__ == '__main__':
         os.mkdir( args.folder )
 
     # Load the list of pathways and their genes
-    if args.verbos:
+    if args.verbose:
         print("Loading pathways")
-    pathway2genes, gene2pathways = load_pathways(args.pathways, args.random)        
-    if args.random:
+    pathway2genes, gene2pathways = load_pathways(args.pathways, args.random_pathways)        
+    if args.random_pathways:
         pathway_sizes = set()
         for pathway in pathway2genes:
             pathway_sizes.add(len(pathway2genes[pathway]))
@@ -127,7 +132,7 @@ if __name__ == '__main__':
                 if args.verbose:
                     print("Loading {}".format(filepath))
                 geq_data = load_geq_file( str(filepath) )
-                if args.random and not already_generated:
+                if args.random_pathways and not already_generated:
                     gene2pathways = generate_random_pathways( list(geq_data.keys()), pathway_sizes, maxnum=args.how_many )
                     already_generated = True
                 aliquot = '-'.join(os.path.splitext(os.path.basename(str(filepath)))[0].split("-")[:-1])
@@ -149,6 +154,20 @@ if __name__ == '__main__':
                                 exclass = line_split[1]
                                 break
                 aliquot2class[aliquot] = exclass
+            
+            shuffled_classes = dict()
+            if args.random_classes:
+                if args.verbose:
+                    print("Shuffling classes")
+                for i in range(args.how_many):
+                    aliquot_arr = list(aliquot2class.keys())
+                    class_arr = list(aliquot2class.values())
+                    random.shuffle(class_arr)
+                    shuffled_classes[i] = dict()
+                    for j in range(len(aliquot_arr)):
+                        shuffled_classes[i][aliquot_arr[j]] = class_arr[j]
+            else:
+                shuffled_classes[0] = aliquot2class
 
             if args.verbose:
                 print("Sorting genes")
@@ -168,16 +187,20 @@ if __name__ == '__main__':
             headers = []
             for aliquot in pathways_data:
                 for pathway in pathways_data[aliquot]:
-                    filename = pathway.translate ({ord(c): "_" for c in "!@#$%^&*()[]{};:,./<>?\|`~-=+ "})
-                    with open(os.path.join(tumor_folder, '{}.csv'.format(filename)), "a+") as m:
-                        if filename not in headers:
-                            m.write('aliquot,{},class\n'.format(','.join(pathway2genes_sorted[pathway])))
-                            headers.append(filename)
-                        gvalues = [ aliquot ]
-                        for gene in pathway2genes_sorted[pathway]:
-                            if gene in pathways_data[aliquot][pathway]:
-                                gvalues.append( pathways_data[aliquot][pathway][gene] )
-                            else:
-                                gvalues.append( "0.0" )
-                        gvalues.append(aliquot2class[aliquot])
-                        m.write( '{}\n'.format(','.join(gvalues)) )
+                    for shuffled_run in shuffled_classes:
+                        filename = pathway.translate({ord(c): "_" for c in "!@#$%^&*()[]{};:,./<>?\|`~-=+ "})
+                        if len(shuffled_classes) > 1:
+                            filename = '{}__s{}'.format(filename, shuffled_run)
+                        with open(os.path.join(tumor_folder, '{}.csv'.format(filename)), "a+") as m:
+                            if filename not in headers:
+                                m.write('aliquot,{},class\n'.format(','.join(pathway2genes_sorted[pathway])))
+                                headers.append(filename)
+                            gvalues = [ aliquot ]
+                            for gene in pathway2genes_sorted[pathway]:
+                                if gene in pathways_data[aliquot][pathway]:
+                                    gvalues.append( pathways_data[aliquot][pathway][gene] )
+                                else:
+                                    gvalues.append( "0.0" )
+                            #gvalues.append(aliquot2class[aliquot])
+                            gvalues.append(shuffled_classes[shuffled_run][aliquot])
+                            m.write( '{}\n'.format(','.join(gvalues)) )
