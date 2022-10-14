@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
 
-__authors__ = ( 'Fabio Cumbo (fabio.cumbo@unitn.it)' )
+__authors__ = ( 'Fabio Cumbo (fabio.cumbo@unitn.it)',
+                'Giovanni Felici (giovanni.felici@iasi.cnr.it)',
+                'Paola Bertolazzi (paola.bertolazzi@iasi.cnr.it)',
+                'Gabriella Mavelli (gabriella.mavelli@iasi.cnr.it)' )
 __version__ = '0.01'
 __date__ = 'Mar 23, 2021'
 
@@ -53,8 +56,8 @@ TUMORS = [ "tcga-acc","tcga-blca","tcga-brca","tcga-cesc","tcga-chol",
 GEQ_MASK = "/shares/CIBIO-Storage/CM/scratch/users/fabio.cumbo/tmp/bed/{}/"
 
 def load_pathways( pathways_filepath, genrandom ):
-    pathway2genes = {}
-    gene2pathways = {}
+    pathway2genes = dict()
+    gene2pathways = dict()
     with open(pathways_filepath) as m:
         for line in m:
             line = line.strip()
@@ -65,14 +68,14 @@ def load_pathways( pathways_filepath, genrandom ):
                     pathway = '{}__{}__{}'.format(line_split[0], line_split[1], line_split[2])
                     for g in genes:
                         if g not in gene2pathways:
-                            gene2pathways[g] = []
+                            gene2pathways[g] = list()
                         gene2pathways[g].append(pathway)
                     if genrandom:
                         pathway2genes[pathway] = genes
     return pathway2genes, gene2pathways
 
 def load_geq_file( geq_filepath ):
-    geq_data = {}
+    geq_data = dict()
     with open(filepath) as geq_file:
         for line in geq_file:
             line = line.strip()
@@ -84,7 +87,7 @@ def load_geq_file( geq_filepath ):
     return geq_data
 
 def generate_random_pathways( genes, pathway_sizes, maxnum=100 ):
-    gene2pathways = {}
+    gene2pathways = dict()
     for random_pathway in pathway_sizes:
         random_selection = list()
         while len(random_selection) < maxnum:
@@ -176,15 +179,15 @@ if __name__ == '__main__':
                 for pathway in pathways_data[aliquot]:
                     for gene in pathways_data[aliquot][pathway]:
                         if pathway not in pathway2genes:
-                            pathway2genes[pathway] = []
+                            pathway2genes[pathway] = list()
                         pathway2genes[pathway].append(gene)
-            pathway2genes_sorted = {}
+            pathway2genes_sorted = dict()
             for pathway in pathway2genes:
                 pathway2genes_sorted[pathway] = sorted(list(set(pathway2genes[pathway])))
 
             if args.verbose:
                 print("Building matrices\n")
-            headers = []
+            headers = list()
             for aliquot in pathways_data:
                 for pathway in pathways_data[aliquot]:
                     for shuffled_run in shuffled_classes:

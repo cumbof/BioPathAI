@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 
 __authors__ = ( 'Fabio Cumbo (fabio.cumbo@unitn.it)',
-                'Giovanni Felici (giovanni.felici@iasi.cnr.it)' )
+                'Giovanni Felici (giovanni.felici@iasi.cnr.it)',
+                'Paola Bertolazzi (paola.bertolazzi@iasi.cnr.it)',
+                'Gabriella Mavelli (gabriella.mavelli@iasi.cnr.it)' )
 __version__ = '0.01'
 __date__ = 'Jun 07, 2021'
 

@@ -88,7 +88,7 @@ def test_matrix(dataframe, test_size=.20, folds=5, nproc=1, verbose=False):
     train, test = train_test_split(dataframe, test_size=test_size, random_state=42)
     # Fixing folds
     class_labels = sorted(list(set(dataframe["class"])))
-    samples_per_class = {}
+    samples_per_class = dict()
     for class_label in class_labels:
         samples_per_class[class_label] = len(list(train[ train["class"] == class_label ].index))
     min_samples_in_class = min(samples_per_class.values())
@@ -125,8 +125,8 @@ def process_matrix(train_baseline, test_baseline, class_labels, out,
     if verbose:
         print("\t\tIteration {}".format(iteration))
     stops = 0
-    accuracies = { }
-    rules = { }
+    accuracies = dict()
+    rules = dict()
     for class_label in class_labels:
         train = copy.deepcopy(train_baseline)
         test = copy.deepcopy(test_baseline)
@@ -156,7 +156,7 @@ def process_matrix(train_baseline, test_baseline, class_labels, out,
                 # Take classes out of the test set
                 X_test = test.drop('class', axis=1)
                 y_test = test['class']
-                rules_actors = [ ]
+                rules_actors = list()
                 with open(out, 'a+') as outfile:
                     outfile.write("# class: {}\n".format(class_label))
                     # Compute accuracy
@@ -175,7 +175,7 @@ def process_matrix(train_baseline, test_baseline, class_labels, out,
                         # Structure rule in a human readable format
                         human_readable_rule = "{}{}".format( str(rule).replace("[", "").replace("]", "").replace("^", " AND "), " OR" if idx<len(clf.ruleset_)-1 else "" )
                         concat_rule += human_readable_rule.strip()
-                        actors = []
+                        actors = list()
                         # Identify rules actors
                         for actor in human_readable_rule.split(" "):
                             actor = actor.strip()
@@ -253,9 +253,9 @@ if __name__ == '__main__':
         outfile.write("# scores coefficient of variation: {}\n".format(scores_coeff_variation))
         outfile.write("\n")    
     
-    class2exclude = { }
-    prev_iter_cols = { }
-    prev_accuracies = { }
+    class2exclude = dict()
+    prev_iter_cols = dict()
+    prev_accuracies = dict()
     for class_label in class_labels:
         prev_iter_cols[class_label] = cols
         prev_accuracies[class_label] = 100.0
@@ -265,7 +265,7 @@ if __name__ == '__main__':
 
     if args.verbose:
         print("\tRunning RIPPER")
-    stats = { }
+    stats = dict()
     iteration = 1
     stop = False
     while iteration <= max_iterations and not stop:
@@ -274,7 +274,7 @@ if __name__ == '__main__':
                                                                                 args.min_size, max_size, iteration, 
                                                                                 prev_iter_cols, prev_accuracies, args.min_accuracy,
                                                                                 verbose=args.verbose)
-        stats[ iteration ] = { }
+        stats[ iteration ] = dict()
         for class_label in class_labels:
             if class_label in accuracies:
                 prev_accuracies[class_label] = accuracies[class_label]
@@ -286,11 +286,11 @@ if __name__ == '__main__':
 
     if args.verbose:
         print("\tEvaluating dataset")
-    scores = { }
+    scores = dict()
     for iteration in stats:
         for class_label in stats[ iteration ]:
             if class_label not in scores:
-                scores[ class_label ] = { }
+                scores[ class_label ] = dict()
             if stats[ iteration ][ class_label ][ "rules" ]:
                 rules = [ r.strip() for r in stats[ iteration ][ class_label ][ "rules" ].split( "OR" ) ]
                 prev_iters = 1
