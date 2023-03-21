@@ -28,7 +28,7 @@ setuptools.setup(
     entry_points={"console_scripts": ["pamlap=pamlap.pamlap:main"]},
     install_requires=[
         "pandas>=1.3.5",
-        "sklearn>=0.22.1",
+        "scikit-learn>=0.22.1",
     ],
     keywords=[
         "bioinformatics",
