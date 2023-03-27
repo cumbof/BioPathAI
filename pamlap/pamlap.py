@@ -157,7 +157,7 @@ def read_params():
         version="{} version {} ({})".format(TOOL_ID, __version__, __date__),
         help="Print {} version and exit".format(TOOL_ID),
     )
-    return p.parse_known_args()
+    return p.parse_args()
 
 
 def main() -> None:
@@ -225,7 +225,7 @@ def main() -> None:
         for job in jobs:
             file_id, file_evaluations = job.get()
             evaluations[file_id] = file_evaluations
-    
+
     # TODO Produce p-values
 
     t1 = time.time()

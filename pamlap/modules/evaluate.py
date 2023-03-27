@@ -62,16 +62,16 @@ def get_classifier(
             min_samples_split=min_samples_split,
             random_state=seed
         )
-    
+
     elif classifier_name.lower() == "gaussianprocess":
         return GaussianProcessClassifier(
             gaussian_process_val * RBF(gaussian_process_rbf),
             random_state=seed
         )
-    
+
     elif classifier_name.lower() == "nearestneighbors":
         return KNeighborsClassifier(k_neighbors)
-    
+
     elif classifier_name.lower() == "neuralnet":
         return MLPClassifier(
             hidden_layer_sizes=hidden_layer_sizes,
@@ -86,7 +86,7 @@ def get_classifier(
             max_features=max_features,
             random_state=seed
         )
-    
+
     elif classifier_name.lower() == "svm":
         return SVC(kernel=svc_kernel, C=svc_c, random_state=seed)
 
@@ -116,7 +116,7 @@ def evaluate(
     :return:                Dictionary with paths to the "confusion" and "evaluate" files
                             Return a dictionary with StringIO objects in case of in_memory
     """
-    
+
     evaluations = dict()
 
     if isinstance(input_file, str):
@@ -146,27 +146,27 @@ def evaluate(
     # Process the input_file matrix
     if verbose:
         print("Building evaluation matrix")
-        
+
         if isinstance(input_file, str):
             print("\tInput: {}".format(input_file))
-    
+
     # Load matrix as pandas dataframe
     dataframe = pd.read_csv(input_file, index_col=0)
-    
+
     # Fix class column name
     dataframe.set_axis([*dataframe.columns[:-1], "Class"], axis=1, inplace=True)
     pathsize = len(list(dataframe.columns)) - 1  # Exclude the 'Class' column
-    
+
     if verbose:
         print("\tPathway Size: {}".format(pathsize))
-    
+
     # Select a set of classifiers
     models = dict()
     selected_algorithms = list()
-    
+
     for classifier in classifiers:
         classifier_obj = get_classifier(classifier)
-        
+
         if classifier_obj is not None:
             models[classifier] = classifier_obj
             selected_algorithms.append(classifier)
@@ -179,10 +179,10 @@ def evaluate(
     # Dummify our data to make sklearn happy
     x = pd.get_dummies(X_df, columns=X_df.select_dtypes("object").columns)
     y = y_df.map(lambda v: labels.index(v))
-    
+
     samples_profiles_real = dict()
     samples_list_sorted = list(y.index)
-    
+
     for sample, class_label in zip(list(y.index), list(y.values)):
         samples_profiles_real[sample] = class_label
 
@@ -191,7 +191,7 @@ def evaluate(
 
     if in_memory:
         confusion_outfile = StringIO()
-        
+
     else:
         # Open output file
         confusion_outfile = open(confusion_filepath, "w+")
@@ -204,34 +204,34 @@ def evaluate(
         print("\tRunning algorithms:")
 
     sample_profiles_predicted = dict()
-    
+
     for model_name in selected_algorithms:
         model = models[model_name]
-        
+
         if verbose:
             print("\t\t{}".format(model_name))
-        
+
         # Initialize KFold
         kfold = KFold(n_splits=folds)
-        
+
         t0 = time.time()
-        
+
         # Run current classification model in cross validation
         # Keep track of running time
         y_pred = cross_val_predict(model, x, y, cv=kfold, n_jobs=nproc)
-        
+
         t1 = time.time()
-        
+
         for predicted_class_idx in range(len(y_pred)):
             sample = samples_list_sorted[predicted_class_idx]
 
             if sample not in sample_profiles_predicted:
                 sample_profiles_predicted[sample] = list()
-            
+
             sample_profiles_predicted[sample].append( "0" if y_pred[predicted_class_idx] == samples_profiles_real[sample] else "1" )
-        
+
         conf_matrix = confusion_matrix(y, y_pred, labels=list(range(len(labels))))
-        
+
         # Dump the confusion matrix into the output file
         row_count = 0
         for row in conf_matrix:
@@ -249,21 +249,21 @@ def evaluate(
 
     if in_memory:
         evaluate_outfile = StringIO()
-    
+
     else:
         evaluate_outfile = open(evaluate_filepath, "w+")
 
     # Dump also the evaluation matrix
     evaluate_outfile.write("# Pathway size: {}\n".format(pathsize))
     evaluate_outfile.write("# Sample,{}\n".format(",".join(selected_algorithms)))
-    
+
     for sample in sample_profiles_predicted:
         evaluate_outfile.write("{},{}\n".format(sample, ",".join(sample_profiles_predicted[sample])))
-    
+
     if in_memory:
         evaluate_outfile.seek(0)
         evaluations["evaluate"] = evaluate_outfile
-    
+
     else:
         evaluations["evaluate"] = evaluate_filepath
 

@@ -21,33 +21,33 @@ def load_pathways(pathways_filepath: str, genrandom: bool) -> Tuple[Dict[str, Li
     :param genrandom:           True in case of processing random pathways
     :return:                    Dictionaries with mapping between pathways and genes
     """
-    
+
     pathway2genes = dict()
     gene2pathways = dict()
 
     with open(pathways_filepath) as infile:
         for line in infile:
             line = line.strip()
-            
+
             if line:
                 if not line.startswith("#"):
                     line_split = line.split("\t")
-                    
+
                     # Get the list of genes
                     genes = line_split[-1].split(",")
-                    
+
                     # Get the pathway name
                     pathway = '{}__{}__{}'.format(line_split[0], line_split[1], line_split[2])
-                    
+
                     for gene in genes:
                         if gene not in gene2pathways:
                             gene2pathways[gene] = list()
-                        
+
                         gene2pathways[gene].append(pathway)
-                    
+
                     if genrandom:
                         pathway2genes[pathway] = genes
-    
+
     return pathway2genes, gene2pathways
 
 
@@ -61,17 +61,17 @@ def load_input_data(filepath: str, key_pos: int = 0, value_pos: int = 1, sep: st
     :param sep:         Field separator
     :return:            Dictionary with data
     """
-    
+
     data = dict()
-    
+
     with open(filepath) as infile:
         for line in infile:
             line = line.strip()
-            
+
             if line:
                 line_split = line.split(sep)
                 data[line_split[key_pos]] = line_split[value_pos]
-    
+
     return data
 
 
@@ -84,25 +84,25 @@ def generate_random_pathways(genes: List[str], pathway_sizes: Set[str], maxnum: 
     :param maximum:         Maximum number of random pathways
     :return:                Dictionary with mapping between genes and random pathways
     """
-    
+
     gene2pathways = dict()
 
     for random_pathway in pathway_sizes:
         random_selection = list()
-        
+
         while len(random_selection) < maxnum:
             random_genes = random.sample(genes, random_pathway)
-            
+
             if random_genes not in random_selection:
                 random_selection.append(random_genes)
-        
+
         for num, selection in enumerate(random_selection):
             for gene in selection:
                 if gene not in gene2pathways:
                     gene2pathways[gene] = list()
-                
+
                 gene2pathways[gene].append("{}_{}".format(random_pathway, num))
-    
+
     return gene2pathways
 
 
@@ -133,17 +133,17 @@ def build_pathway_matrix(
     for fileid in pathways_data:
         for shuffled_run in shuffled_classes:
             filename = pathway.translate({ord(c): "_" for c in "!@#$%^&*()[]{};:,./<>?\|`~-=+ "})
-            
+
             if len(shuffled_classes) > 1:
                 filename = "{}__s{}".format(filename, shuffled_run)
-            
+
             out_filepath = os.path.join(out_folder, "{}.csv".format(filename))
-            
+
             outfile = None
 
             if in_memory:
                 outfile = StringIO()
-            
+
             else:
                 matrices[out_filepath] = out_filepath
                 outfile = open(out_filepath, "a+")
@@ -157,12 +157,12 @@ def build_pathway_matrix(
             for gene in pathway2genes_sorted[pathway]:
                 if gene in pathways_data[fileid][pathway]:
                     line.append(pathways_data[fileid][pathway][gene])
-                
+
                 else:
                     line.append("0.0")
-            
+
             line.append(shuffled_classes[shuffled_run][fileid])
-            
+
             outfile.write("{}\n".format(",".join(line)))
 
             if in_memory:
@@ -171,7 +171,7 @@ def build_pathway_matrix(
 
             else:
                 outfile.close()
-    
+
     return matrices
 
 
@@ -235,7 +235,7 @@ def prepare(
     with open(in_file) as infile:
         for line in infile:
             line = line.strip()
-            
+
             if line:
                 line_split = line.split("\t")
 
@@ -250,13 +250,13 @@ def prepare(
 
                 if verbose:
                     print("Loading {}".format(line_split[0]))
-                
+
                 data = load_input_data(line_split[0], key_pos=in_key_pos, value_pos=in_value_pos, sep=in_sep)
 
                 if random_pathways and not already_generated:
                     gene2pathways = generate_random_pathways(list(data.keys()), pathway_sizes, maxnum=how_many)
                     already_generated = True
-                
+
                 file_id = os.path.splitext(os.path.basename(line_split[0]))[0]
                 pathways_data[file_id] = dict()
 
@@ -265,7 +265,7 @@ def prepare(
                         for pathway in gene2pathways[gene]:
                             if pathway not in pathways_data[file_id]:
                                 pathways_data[file_id][pathway] = dict()
-                            
+
                             pathways_data[file_id][pathway][gene] = data[gene]
 
                 fileid2class[file_id] = line_split[1]
@@ -275,7 +275,7 @@ def prepare(
     if random_classes:
         if verbose:
             print("Shuffling classes")
-        
+
         for i in range(how_many):
             fileid_arr = list(fileid2class.keys())
             class_arr = list(fileid2class.values())
@@ -291,17 +291,17 @@ def prepare(
 
     if verbose:
         print("Sorting genes")
-    
+
     pathway2genes = dict()
-    
+
     for fileid in pathways_data:
         for pathway in pathways_data[fileid]:
             for gene in pathways_data[fileid][pathway]:
                 if pathway not in pathway2genes:
                     pathway2genes[pathway] = list()
-                
+
                 pathway2genes[pathway].append(gene)
-    
+
     pathway2genes_sorted = dict()
 
     for pathway in pathway2genes:
@@ -309,7 +309,7 @@ def prepare(
 
     if verbose:
         print("Building matrices")
-    
+
     with mp.Pool(processes=nproc) as pool:
         build_pathway_matrix_partial = partial(
             build_pathway_matrix,
