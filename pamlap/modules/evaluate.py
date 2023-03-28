@@ -132,6 +132,10 @@ def evaluate(
     if not classifiers:
         classifiers = SUPPORTED_CLASSIFIERS
 
+    # In case it has been selected only one classifier
+    if isinstance(classifiers, str):
+        classifiers = [classifiers]
+
     classifiers = list(set(classifiers).intersection(set(SUPPORTED_CLASSIFIERS)))
 
     if not classifiers:
