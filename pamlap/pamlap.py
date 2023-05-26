@@ -4,13 +4,10 @@ PAMLAp: a machine learning based flexible approach for pathways analysis
 """
 
 __authors__ = ("Fabio Cumbo (fabio.cumbo@gmail.com)",
-               "Valerio Ponzi (ponzi@diag.uniroma1.it)",
-               "Giovanni Felici (giovanni.felici@iasi.cnr.it)",
-               "Paola Bertolazzi (paola.bertolazzi@iasi.cnr.it)",
-               "Gabriella Mavelli (gabriella.mavelli@iasi.cnr.it)")
+               "Valerio Ponzi (ponzi@diag.uniroma1.it)")
 
 __version__ = "0.1.0"
-__date__ = "Mar 19, 2023"
+__date__ = "May 26, 2023"
 
 import argparse as ap
 import multiprocessing as mp
@@ -50,11 +47,11 @@ def read_params():
         help="Make the execution of the classification algorithms parallel"
     )
     p.add_argument(
-        "--classifiers",
+        "--classifier",
         type=str,
-        nargs="+",
+        choices=["decisiontree", "gaussianprocess", "nearestneighbors", "neuralnet", "randomforest", "svm"],
         default="randomforest",
-        help="Select one or more classification algorithms"
+        help="Select a classification algorithms"
     )
     p.add_argument(
         "--evaluate-in-memory",
@@ -167,6 +164,11 @@ def main() -> None:
     if args.verbose:
         print("{} v{} ({})".format(TOOL_ID, __version__, __date__))
 
+    output_filepath = os.path.join(args.out_folder, "accuracy.csv")
+
+    if os.path.isfile(output_filepath):
+        raise Exception("The output file already exists!\n{}".format(output_filepath))
+
     t0 = time.time()
 
     prepare_output_folder = os.path.join(args.out_folder, "matrices")
@@ -192,15 +194,14 @@ def main() -> None:
 
     evaluations_folder = os.path.join(args.out_folder, "evaluations")
 
-    if not os.path.isdir(evaluations_folder):
-        os.makedirs(evaluations_folder, exist_ok=True)
+    os.makedirs(evaluations_folder, exist_ok=True)
 
-    evaluations = dict()
+    accuracies = dict()
 
     with mp.Pool(processes=args.nproc) as pool:
         evaluate_partial = partial(
             evaluate,
-            classifiers=args.classifiers,
+            classifiers=[args.classifier],
             folds=args.folds,
             in_memory=args.evaluate_in_memory,
             nproc=args.classifier_nproc,
@@ -223,10 +224,27 @@ def main() -> None:
         ]
 
         for job in jobs:
-            file_id, file_evaluations = job.get()
-            evaluations[file_id] = file_evaluations
+            file_id, _, file_accuracies = job.get()
+            accuracies[file_id] = file_accuracies
 
-    # TODO Produce p-values
+    if accuracies:
+        with open(output_filepath, "w+") as outfile:
+            outfile.write("Name,Accuracy\n")
+
+            # Sort file IDs based on the accuracy in descending order
+            sorted_acc = sorted(
+                accuracies.keys(),
+                key=lambda file_id: accuracies[file_id][args.classifier],
+                reverse=True
+            )
+
+            for file_id in sorted_acc:
+                outfile.write(
+                    "{},{}\n".format(
+                        os.path.splitext(os.path.basename(file_id))[0],
+                        accuracies[file_id][args.classifier]
+                    )
+                )
 
     t1 = time.time()
 
