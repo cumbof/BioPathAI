@@ -17,7 +17,7 @@ from sklearn.gaussian_process import GaussianProcessClassifier
 from sklearn.gaussian_process.kernels import RBF
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.metrics import confusion_matrix
+from sklearn.metrics import confusion_matrix, accuracy_score
 from sklearn.model_selection import KFold, cross_val_predict
 
 SUPPORTED_CLASSIFIERS = [
@@ -100,7 +100,7 @@ def evaluate(
     in_memory: bool = False,
     nproc: int = 1,
     verbose: bool = False
-) -> Tuple[str, Union[Dict[str, Dict[str, str]], Dict[str, Dict[str, StringIO]]]]:
+) -> Tuple[str, Union[Dict[str, Dict[str, str]], Dict[str, Dict[str, StringIO]]], Dict[str, float]]:
     """
     Run multiple machine learning algorithms over an input dataset in cross validation
     and report the confusion matrices
@@ -115,6 +115,7 @@ def evaluate(
     :param verbose:         Pront messages on the stdout
     :return:                Dictionary with paths to the "confusion" and "evaluate" files
                             Return a dictionary with StringIO objects in case of in_memory
+                            Also return the accuracy for each of the classification models
     """
 
     evaluations = dict()
@@ -209,6 +210,8 @@ def evaluate(
 
     sample_profiles_predicted = dict()
 
+    accuracies = dict()
+
     for model_name in selected_algorithms:
         model = models[model_name]
 
@@ -241,6 +244,9 @@ def evaluate(
         for row in conf_matrix:
             confusion_outfile.write("{} (true),{},{},{},{}\n".format(labels[row_count], row[0], row[1], model_name, float(t1-t0)))
             row_count += 1
+        
+        # Take track of the model accuracy
+        accuracies[model_name] = accuracy_score(y, y_pred)
 
     if in_memory:
         evaluations["confusion"] = confusion_outfile
@@ -271,4 +277,4 @@ def evaluate(
     else:
         evaluations["evaluate"] = evaluate_filepath
 
-    return input_id, evaluations
+    return input_id, evaluations, accuracies
