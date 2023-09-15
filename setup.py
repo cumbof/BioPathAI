@@ -2,7 +2,7 @@ import sys
 
 import setuptools
 
-from biopathai.biopathai import __version__
+from biopathai import __version__
 
 if sys.version_info[0] < 3 or (sys.version_info[0] == 3 and sys.version_info[1] < 6):
     sys.exit(
