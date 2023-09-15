@@ -38,7 +38,9 @@ Signaling by Overexpressed Wild-Type EGFR in Cancer     R-HSA-5638302  Reactome 
 ```
 
 > **Note**
-> The previous example is part of the Consensus Pathway Database available at [http://cpdb.molgen.mpg.de/](http://cpdb.molgen.mpg.de/). Please note that, since there could be multiple pathways with the same name but from different sources, all the four columns are required by `BioPathAI` in order to build a unique identifier for each pathway.
+> The previous example is part of the Consensus Pathway Database available at [http://cpdb.molgen.mpg.de/](http://cpdb.molgen.mpg.de/).
+> 
+> Please note that, since there could be multiple pathways with the same name but from different sources, all the four columns are required by `BioPathAI` in order to build a unique identifier for each pathway.
 
 ### Links to the expression data
 
@@ -55,7 +57,9 @@ Signaling by Overexpressed Wild-Type EGFR in Cancer     R-HSA-5638302  Reactome 
 ```
 
 > **Note**
-> The files listed in the first colum of the previous example must contains at least two columns, one with the gene names in the same format as reported in the pathways definition file (i.e., Gene Symbols in this particular example), the other one with the actual gene expression values. In this example we reported a few free-BED files retrieved from the OpenGDC public FTP repository at [ftp://geco.deib.polimi.it/opengdc/](ftp://geco.deib.polimi.it/opengdc/).
+> The files listed in the first colum of the previous example must contains at least two columns, one with the gene names in the same format as reported in the pathways definition file (i.e., Gene Symbols in this particular example), the other one with the actual gene expression values.
+>
+> In this example we reported a few free-BED files retrieved from the OpenGDC public FTP repository at [ftp://geco.deib.polimi.it/opengdc/](ftp://geco.deib.polimi.it/opengdc/).
 
 ## Usage
 
