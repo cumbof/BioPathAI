@@ -87,7 +87,7 @@ Here is a list of available options:
 This is an example of command line:
 
 ```text
-python biopathai --pathways ~/<pathways-file>.tsv --in-file ~/<data-files>.tsv --in-key-pos 0 --in-value-pos 1 --prepare-in-memory --evaluate-in-memory --out-folder ~/<output-folder>
+biopathai --pathways ~/<pathways-file>.tsv --in-file ~/<data-files>.tsv --in-key-pos 0 --in-value-pos 1 --prepare-in-memory --evaluate-in-memory --out-folder ~/<output-folder>
 ```
 
 > **Note**
