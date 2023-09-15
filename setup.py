@@ -48,8 +48,7 @@ setuptools.setup(
     },
     python_requires=">=3.6",
     scripts=[
-        "scripts/biopathai_pvalues.py",
-        "scripts/pubmed.py",
+        "scripts/biopathai_pvalue.py",
     ],
     url="http://github.com/cumbof/BioPathAI",
     version=__version__,
