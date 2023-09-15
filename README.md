@@ -6,9 +6,9 @@ A Python tool for the analysis of biological pathways with machine learning tech
 
 We developed `BioPathAI` as a Python 3.6 package with the following requirements:
 
-- pandas>=1.3.5
-- scikit-learn>=0.22.1
-- tabulate>=0.9.0
+- `pandas` (version >=1.3.5)
+- `scikit-learn` (version >=0.22.1)
+- `tabulate` (version >=0.9.0)
 
 ## Install
 
