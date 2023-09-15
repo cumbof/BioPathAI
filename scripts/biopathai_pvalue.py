@@ -1,13 +1,12 @@
 #!/usr/bin/env python3
-"""
-Compute the p-values on the accuracies of real and random pathways
+"""Compute the p-values on the accuracies of real and random pathways.
 """
 
 __authors__ = ("Fabio Cumbo (fabio.cumbo@gmail.com)",
                "Valerio Ponzi (ponzi@diag.uniroma1.it)")
 
 __version__ = "0.1.0"
-__date__ = "May 26, 2023"
+__date__ = "Sep 14, 2023"
 
 import argparse as ap
 import errno
@@ -17,7 +16,7 @@ import numpy as np
 import pandas as pd
 from tabulate import tabulate
 
-TOOL_ID = "pamlap_pvalue"
+TOOL_ID = "biopathai_pvalue"
 
 
 def read_params():

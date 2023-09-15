@@ -1,5 +1,4 @@
-"""
-Generate the pathway matrices
+"""Generate the pathway matrices.
 """
 
 import errno
@@ -14,8 +13,7 @@ random.seed(0)
 
 
 def load_pathways(pathways_filepath: str, genrandom: bool) -> Tuple[Dict[str, List[str]], Dict[str, List[str]]]:
-    """
-    Load a pathways definition file
+    """Load a pathways definition file
 
     :param pathways_filepath:   Path to the pathways definition file
     :param genrandom:           True in case of processing random pathways
@@ -52,8 +50,7 @@ def load_pathways(pathways_filepath: str, genrandom: bool) -> Tuple[Dict[str, Li
 
 
 def load_input_data(filepath: str, key_pos: int = 0, value_pos: int = 1, sep: str = "\t") -> Dict[str, str]:
-    """
-    Load the input data
+    """Load the input data
 
     :param filepath:    Path to the input file
     :param key_pos:     Position of keys
@@ -76,8 +73,7 @@ def load_input_data(filepath: str, key_pos: int = 0, value_pos: int = 1, sep: st
 
 
 def generate_random_pathways(genes: List[str], pathway_sizes: Set[str], maxnum: int = 100) -> Dict[str, List[str]]:
-    """
-    Generate random pathways
+    """Generate random pathways
 
     :param genes:           List of genes
     :param pathway_size:    Size of pathway in terms of number of genes
@@ -114,8 +110,7 @@ def build_pathway_matrix(
     out_folder: Optional[str] = None,
     in_memory: bool = False
 ) -> Union[Dict[str, str], Dict[str, StringIO]]:
-    """
-    Dump pathway matrices on file
+    """Dump the pathway matrices to files
 
     :param pathway:                 Name of the pathway
     :param pathways_data:           Pathway data with genes
@@ -189,8 +184,7 @@ def prepare(
     nproc: int = 1,
     verbose: bool = False
 ) -> Union[Dict[str, str], Dict[str, StringIO]]:
-    """
-    Generate the pathway matrices
+    """Generate the pathway matrices
 
     :param in_file:         Path to the input file with the list of paths to the input data files
     :param out_folder:      Path to the output folder

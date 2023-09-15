@@ -1,13 +1,6 @@
 #!/usr/bin/env python3
+"""A Python tool for the analysis of biological pathways with machine learning techniques
 """
-PAMLAp: a machine learning based flexible approach for pathways analysis
-"""
-
-__authors__ = ("Fabio Cumbo (fabio.cumbo@gmail.com)",
-               "Valerio Ponzi (ponzi@diag.uniroma1.it)")
-
-__version__ = "0.1.0"
-__date__ = "May 26, 2023"
 
 import argparse as ap
 import multiprocessing as mp
@@ -17,11 +10,11 @@ import time
 from functools import partial
 from pathlib import Path
 
-from pamlap.modules.evaluate import evaluate
-from pamlap.modules.prepare import prepare
+from biopathai.modules.evaluate import evaluate
+from biopathai.modules.prepare import prepare
 
 # Define the tool name
-TOOL_ID = "PAMLAp"
+TOOL_ID = "BioPathAI"
 
 # Control current Python version
 # It requires Python 3.6 or higher
@@ -36,7 +29,7 @@ if sys.version_info[0] < 3 or (sys.version_info[0] == 3 and sys.version_info[1] 
 def read_params():
     p = ap.ArgumentParser(
         prog=TOOL_ID,
-        description="PAMLAp: a machine learning based flexible approach for pathways analysis",
+        description="{}: a Python tool for the analysis of biological pathways with machine learning techniques".format(TOOL_ID),
         formatter_class=ap.ArgumentDefaultsHelpFormatter,
     )
     p.add_argument(
@@ -51,7 +44,7 @@ def read_params():
         type=str,
         choices=["decisiontree", "gaussianprocess", "nearestneighbors", "neuralnet", "randomforest", "svm"],
         default="randomforest",
-        help="Select a classification algorithms"
+        help="Select a classification algorithm"
     )
     p.add_argument(
         "--evaluate-in-memory",
@@ -71,14 +64,14 @@ def read_params():
         type=int,
         default=1000,
         dest="how_many",
-        help="Number of random pathways for each detected size"
+        help="Number of random pathways"
     )
     p.add_argument(
         "--in-file",
         type=str,
         required=True,
         dest="in_file",
-        help="Path to the input tab-separated-values file with the list of paths to the data files and classes (e.g. normal/tumoral)"
+        help="Path to the input tab-separated-values file with the list of paths to the data files and classes (e.g. control/case)"
     )
     p.add_argument(
         "--in-key-pos",
@@ -99,7 +92,7 @@ def read_params():
         type=int,
         required=True,
         dest="in_value_pos",
-        help="Position of values in input data files (e.g., column with FPKM)"
+        help="Position of values in input data files (e.g., column with the expression values)"
     )
     p.add_argument(
         "--nproc",

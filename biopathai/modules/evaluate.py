@@ -1,6 +1,4 @@
-"""
-Run multiple machine learning algorithms over an input dataset in cross validation
-and report the confusion matrices
+"""Run multiple machine learning algorithms over an input dataset in cross validation and report the confusion matrices.
 """
 
 import errno
@@ -101,8 +99,7 @@ def evaluate(
     nproc: int = 1,
     verbose: bool = False
 ) -> Tuple[str, Union[Dict[str, Dict[str, str]], Dict[str, Dict[str, StringIO]]], Dict[str, float]]:
-    """
-    Run multiple machine learning algorithms over an input dataset in cross validation
+    """Run multiple machine learning algorithms over an input dataset in cross validation
     and report the confusion matrices
 
     :param input_id:        Input ID
