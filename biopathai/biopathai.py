@@ -10,6 +10,7 @@ import time
 from functools import partial
 from pathlib import Path
 
+from biopathai import __date__, __version__
 from biopathai.modules.evaluate import evaluate
 from biopathai.modules.prepare import prepare
 
